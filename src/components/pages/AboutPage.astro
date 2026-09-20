@@ -1,0 +1,30 @@
+---
+import { paths, ui, type Locale } from "../../i18n";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+interface Props { lang: Locale; }
+const { lang } = Astro.props;
+const text = ui[lang];
+const otherLang: Locale = lang === "en" ? "zh-CN" : "en";
+---
+
+<BaseLayout
+  lang={lang}
+  title={text.navAbout}
+  description={lang === "en" ? "About Lewis Zhou and Still Solving." : "关于 Lewis Zhou 与持续求解。"}
+  alternates={[
+    { lang, href: paths[lang].about },
+    { lang: otherLang, href: paths[otherLang].about },
+  ]}
+>
+  <section class="about-page">
+    <p class="section-label">{text.aboutLabel}</p>
+    <h1 class="page-title">Lewis Zhou</h1>
+    <div class="about-grid">
+      <p class="about-statement">{text.aboutStatement}</p>
+      <div class="about-copy">
+        {text.aboutParagraphs.map((paragraph) => <p>{paragraph}</p>)}
+      </div>
+    </div>
+  </section>
+</BaseLayout>

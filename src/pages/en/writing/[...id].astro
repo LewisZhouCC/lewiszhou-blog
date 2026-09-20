@@ -1,17 +1,14 @@
 ---
 import { getCollection, render, type CollectionEntry } from "astro:content";
-import { categoryLabels, paths } from "../../i18n";
-import PostLayout from "../../layouts/PostLayout.astro";
+import { categoryLabels, paths } from "../../../i18n";
+import PostLayout from "../../../layouts/PostLayout.astro";
 
 export async function getStaticPaths() {
-  const posts = await getCollection("writing", ({ data }) => !data.draft && data.lang === "zh-CN");
+  const posts = await getCollection("writing", ({ data }) => !data.draft && data.lang === "en");
   return posts.map((post) => ({ params: { id: post.data.urlSlug }, props: { post } }));
 }
 
-interface Props {
-  post: CollectionEntry<"writing">;
-}
-
+interface Props { post: CollectionEntry<"writing">; }
 const { post } = Astro.props;
 const { Content } = await render(post);
 const translations = await getCollection("writing", ({ data }) => !data.draft && data.translationKey === post.data.translationKey);

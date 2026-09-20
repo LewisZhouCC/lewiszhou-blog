@@ -98,6 +98,11 @@ a { color: inherit; }
   color: var(--muted);
 }
 
+.site-header .language-link {
+  color: var(--blue);
+  font-weight: 650;
+}
+
 .hero {
   position: relative;
   display: grid;

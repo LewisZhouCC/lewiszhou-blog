@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#f2efe7"/>
+  <path d="M70 72h1060M70 558h1060" stroke="#171916"/>
+  <circle cx="1082" cy="119" r="13" fill="#1647ff"/>
+  <text x="70" y="128" fill="#171916" font-family="Arial, sans-serif" font-size="26" font-weight="600">LEWIS ZHOU</text>
+  <text x="70" y="355" fill="#171916" font-family="Georgia, serif" font-size="126">Still Solving</text>
+  <text x="76" y="438" fill="#696b64" font-family="Arial, sans-serif" font-size="29">Making complex problems concrete, one verified step at a time.</text>
+  <text x="1022" y="535" fill="#1647ff" font-family="monospace" font-size="18">FIELD NOTES</text>
+</svg>

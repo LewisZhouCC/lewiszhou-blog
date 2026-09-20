@@ -25,11 +25,16 @@ npm run build
 ---
 title: 文章标题
 description: 一句话摘要
+lang: zh-CN # zh-CN / en
+urlSlug: article-slug
+translationKey: article-slug # 中英文配对使用相同值
 publishedAt: 2026-09-20
-category: 系统 # 系统 / Agent / 产品判断 / 构建日志
+category: systems # systems / agents / product / build
 draft: false
 ---
 ```
+
+中文文章保留在默认路由 `/writing/:slug/`，英文文章发布到 `/en/writing/:slug/`。只有真实存在的翻译页面才应互相声明 `hreflang`。
 
 ## Cloudflare Pages
 

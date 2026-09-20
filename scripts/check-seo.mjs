@@ -9,6 +9,10 @@ for (const file of ["robots.txt", "sitemap-index.xml", "sitemap-0.xml"]) {
   if (!existsSync(new URL(file, dist))) errors.push(`Missing ${file}`);
 }
 
+for (const file of ["rss.xml", "en/rss.xml"]) {
+  if (!existsSync(new URL(file, dist))) errors.push(`Missing ${file}`);
+}
+
 if (existsSync(new URL("robots.txt", dist))) {
   const robots = readFileSync(new URL("robots.txt", dist), "utf8");
   if (!robots.includes("Sitemap: https://lewiszhou.dev/sitemap-index.xml")) {
@@ -21,18 +25,26 @@ const htmlFiles = readdirSync(dist, { recursive: true })
 const titles = new Map();
 const descriptions = new Map();
 const canonicals = new Map();
+const pages = new Map();
 
 for (const file of htmlFiles) {
   const html = readFileSync(join(dist.pathname, file), "utf8");
   const title = html.match(/<title>(.*?)<\/title>/s)?.[1]?.trim();
   const description = html.match(/<meta name="description" content="(.*?)"/s)?.[1]?.trim();
   const canonical = html.match(/<link rel="canonical" href="(.*?)"/s)?.[1]?.trim();
+  const htmlLang = html.match(/<html lang="(.*?)"/)?.[1]?.trim();
+  const expectedLang = file.startsWith("en/") ? "en" : "zh-CN";
   const h1Count = (html.match(/<h1\b/g) ?? []).length;
   const jsonScripts = [...html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/gs)];
+  const hreflangs = Object.fromEntries(
+    [...html.matchAll(/<link rel="alternate" hreflang="(.*?)" href="(.*?)"/g)]
+      .map((match) => [match[1], match[2]]),
+  );
 
   if (!title) errors.push(`${file}: missing title`);
   if (!description) errors.push(`${file}: missing meta description`);
   if (!canonical?.startsWith("https://lewiszhou.dev/")) errors.push(`${file}: invalid canonical URL`);
+  if (htmlLang !== expectedLang) errors.push(`${file}: expected html lang ${expectedLang}, found ${htmlLang}`);
   if (h1Count !== 1) errors.push(`${file}: expected one H1, found ${h1Count}`);
   if (jsonScripts.length !== 1) errors.push(`${file}: expected one JSON-LD script`);
 
@@ -51,16 +63,34 @@ for (const file of htmlFiles) {
 
   for (const match of jsonScripts) {
     try {
-      JSON.parse(match[1]);
+      const data = JSON.parse(match[1]);
+      const pageNode = data["@graph"]?.find((node) => node["@type"] === "WebPage" || node["@type"] === "BlogPosting");
+      if (pageNode?.inLanguage !== expectedLang) errors.push(`${file}: JSON-LD language does not match ${expectedLang}`);
     } catch {
       errors.push(`${file}: invalid JSON-LD`);
     }
   }
 
+  if (canonical && hreflangs[expectedLang] !== canonical) errors.push(`${file}: missing self hreflang`);
+  const otherLang = expectedLang === "en" ? "zh-CN" : "en";
+  if (!hreflangs[otherLang]) errors.push(`${file}: missing ${otherLang} alternate`);
+  if (canonical) pages.set(canonical, { file, lang: expectedLang, hreflangs });
+
   if (file.startsWith("writing/") && file !== "writing/index.html") {
     if (!html.includes('property="og:type" content="article"')) errors.push(`${file}: missing article Open Graph type`);
     if (!html.includes('"@type":"BlogPosting"')) errors.push(`${file}: missing BlogPosting schema`);
     if (!html.includes('rel="author"')) errors.push(`${file}: missing visible author link`);
+  }
+}
+
+for (const [canonical, page] of pages) {
+  for (const [alternateLang, alternateURL] of Object.entries(page.hreflangs)) {
+    const target = pages.get(alternateURL);
+    if (!target) {
+      errors.push(`${page.file}: ${alternateLang} alternate does not resolve to a built page`);
+      continue;
+    }
+    if (target.hreflangs[page.lang] !== canonical) errors.push(`${page.file}: alternate link is not reciprocal with ${target.file}`);
   }
 }
 
