@@ -1,0 +1,33 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const posts = (await getCollection("writing", ({ data }) => !data.draft))
+  .sort((a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf());
+
+const formatDate = (date: Date) => new Intl.DateTimeFormat("zh-CN", {
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+}).format(date).replaceAll("/", ".");
+---
+
+<BaseLayout title="文章" description="Lewis Zhou 关于系统、Agent、产品判断与构建过程的文章。">
+  <section class="writing-page">
+    <p class="section-label">Writing / 文章</p>
+    <h1 class="page-title">所有求解记录</h1>
+    <p class="page-intro">这里不收集正确答案，只记录问题如何被定义、验证，以及最后真正发生了什么。</p>
+    <div class="post-list">
+      {posts.map((post, index) => (
+        <a class="post-row" href={`/writing/${post.id}/`}>
+          <span class="index-no">{String(index + 1).padStart(2, "0")}</span>
+          <h2>{post.data.title}</h2>
+          <span class="post-meta">
+            <span>{post.data.category}</span>
+            <time datetime={post.data.publishedAt.toISOString()}>{formatDate(post.data.publishedAt)}</time>
+          </span>
+        </a>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,126 @@
+---
+import Header from "../components/Header.astro";
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  pageType?: "website" | "article";
+  publishedAt?: Date;
+  updatedAt?: Date;
+  category?: string;
+}
+
+const {
+  title = "Lewis Zhou — 持续求解",
+  description = "把复杂问题，一步步做实。记录系统、Agent、产品判断与构建过程。",
+  image = "/social-card.png",
+  pageType = "website",
+  publishedAt,
+  updatedAt,
+  category,
+} = Astro.props;
+
+const pageTitle = title === "Lewis Zhou — 持续求解" ? title : `${title} — Lewis Zhou`;
+const canonicalURL = Astro.site ? new URL(Astro.url.pathname, Astro.site) : Astro.url;
+const socialImage = Astro.site ? new URL(image, Astro.site) : new URL(image, Astro.url);
+const siteURL = new URL("/", canonicalURL);
+const aboutURL = new URL("/about/", canonicalURL);
+const personID = `${aboutURL}#person`;
+const websiteID = `${siteURL}#website`;
+
+const graph: Record<string, unknown>[] = [
+  {
+    "@type": "Person",
+    "@id": personID,
+    name: "Lewis Zhou",
+    url: aboutURL,
+  },
+  {
+    "@type": "WebSite",
+    "@id": websiteID,
+    url: siteURL,
+    name: "Lewis Zhou — 持续求解",
+    alternateName: "Still Solving",
+    description: "把复杂问题，一步步做实。",
+    inLanguage: "zh-CN",
+    author: { "@id": personID },
+  },
+];
+
+if (pageType === "article" && publishedAt) {
+  graph.push({
+    "@type": "BlogPosting",
+    "@id": `${canonicalURL}#article`,
+    mainEntityOfPage: canonicalURL,
+    url: canonicalURL,
+    headline: title,
+    description,
+    datePublished: publishedAt.toISOString(),
+    dateModified: (updatedAt ?? publishedAt).toISOString(),
+    articleSection: category,
+    inLanguage: "zh-CN",
+    author: { "@id": personID },
+    publisher: { "@id": personID },
+    isPartOf: { "@id": websiteID },
+  });
+} else {
+  graph.push({
+    "@type": "WebPage",
+    "@id": `${canonicalURL}#webpage`,
+    url: canonicalURL,
+    name: pageTitle,
+    description,
+    inLanguage: "zh-CN",
+    isPartOf: { "@id": websiteID },
+  });
+}
+
+const structuredData = { "@context": "https://schema.org", "@graph": graph };
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="author" content="Lewis Zhou" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#f2efe7" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={canonicalURL} />
+    <link rel="alternate" type="application/rss+xml" title="Lewis Zhou" href="/rss.xml" />
+    <meta property="og:type" content={pageType} />
+    <meta property="og:site_name" content="Lewis Zhou — 持续求解" />
+    <meta property="og:locale" content="zh_CN" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:image" content={socialImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImage} />
+    {publishedAt && <meta property="article:published_time" content={publishedAt.toISOString()} />}
+    {updatedAt && <meta property="article:modified_time" content={updatedAt.toISOString()} />}
+    {category && <meta property="article:section" content={category} />}
+    {pageType === "article" && <meta property="article:author" content="Lewis Zhou" />}
+    <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+    <title>{pageTitle}</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">跳到正文</a>
+    <div class="page-shell">
+      <Header />
+      <main id="main-content">
+        <slot />
+      </main>
+      <footer class="site-footer">
+        <p>Lewis Zhou · Still Solving</p>
+        <p>复杂问题没有捷径，但可以持续求解。</p>
+      </footer>
+    </div>
+  </body>
+</html>

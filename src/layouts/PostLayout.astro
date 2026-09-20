@@ -1,0 +1,43 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+
+interface Props {
+  title: string;
+  description: string;
+  publishedAt: Date;
+  updatedAt?: Date;
+  category: string;
+}
+
+const { title, description, publishedAt, updatedAt, category } = Astro.props;
+const formatDate = (date: Date) => new Intl.DateTimeFormat("zh-CN", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+}).format(date);
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  pageType="article"
+  publishedAt={publishedAt}
+  updatedAt={updatedAt}
+  category={category}
+>
+  <article class="post-page">
+    <header class="post-header">
+      <a class="back-link" href="/writing/">← 所有文章</a>
+      <div class="post-kicker">
+        <span><a href="/about/" rel="author">Lewis Zhou</a> · {category}</span>
+        <time datetime={publishedAt.toISOString()}>{formatDate(publishedAt)}</time>
+      </div>
+      <h1>{title}</h1>
+      <p>{description}</p>
+      {updatedAt && <small>最后更新于 {formatDate(updatedAt)}</small>}
+    </header>
+    <div class="prose">
+      <slot />
+    </div>
+  </article>
+</BaseLayout>
