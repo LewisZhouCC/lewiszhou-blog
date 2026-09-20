@@ -1,8 +1,11 @@
 ---
 title: 为什么叫“持续求解”
 description: 复杂问题很少被一次解决。更可靠的方式，是把判断、验证和结果连成一条可以回看的路径。
+lang: zh-CN
+urlSlug: why-still-solving
+translationKey: why-still-solving
 publishedAt: 2026-09-20
-category: 构建日志
+category: build
 draft: false
 ---
 

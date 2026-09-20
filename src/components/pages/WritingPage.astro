@@ -1,0 +1,48 @@
+---
+import { getCollection } from "astro:content";
+import { categoryLabels, paths, ui, type Locale } from "../../i18n";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+interface Props { lang: Locale; }
+const { lang } = Astro.props;
+const text = ui[lang];
+const localePaths = paths[lang];
+const otherLang: Locale = lang === "en" ? "zh-CN" : "en";
+
+const posts = (await getCollection("writing", ({ data }) => !data.draft && data.lang === lang))
+  .sort((a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf());
+
+const formatDate = (date: Date) => new Intl.DateTimeFormat(lang === "en" ? "en-US" : "zh-CN", {
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+}).format(date).replaceAll("/", ".");
+---
+
+<BaseLayout
+  lang={lang}
+  title={text.navWriting}
+  description={lang === "en" ? "Lewis Zhou's writing on systems, agents, product decisions, and building in practice." : "Lewis Zhou 关于系统、Agent、产品判断与构建过程的文章。"}
+  alternates={[
+    { lang, href: localePaths.writing },
+    { lang: otherLang, href: paths[otherLang].writing },
+  ]}
+>
+  <section class="writing-page">
+    <p class="section-label">{text.writingLabel}</p>
+    <h1 class="page-title">{text.writingTitle}</h1>
+    <p class="page-intro">{text.writingIntro}</p>
+    <div class="post-list">
+      {posts.map((post, index) => (
+        <a class="post-row" href={localePaths.post(post.data.urlSlug)}>
+          <span class="index-no">{String(index + 1).padStart(2, "0")}</span>
+          <h2>{post.data.title}</h2>
+          <span class="post-meta">
+            <span>{categoryLabels[lang][post.data.category]}</span>
+            <time datetime={post.data.publishedAt.toISOString()}>{formatDate(post.data.publishedAt)}</time>
+          </span>
+        </a>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

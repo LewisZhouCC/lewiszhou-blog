@@ -1,11 +1,19 @@
 ---
 import Header from "../components/Header.astro";
+import { paths, ui, type Locale } from "../i18n";
 import "../styles/global.css";
+
+interface Alternate {
+  lang: Locale;
+  href: string;
+}
 
 interface Props {
   title?: string;
   description?: string;
   image?: string;
+  lang?: Locale;
+  alternates?: Alternate[];
   pageType?: "website" | "article";
   publishedAt?: Date;
   updatedAt?: Date;
@@ -13,20 +21,23 @@ interface Props {
 }
 
 const {
-  title = "Lewis Zhou — 持续求解",
-  description = "把复杂问题，一步步做实。记录系统、Agent、产品判断与构建过程。",
-  image = "/social-card.png",
+  lang = "zh-CN",
+  alternates = [],
   pageType = "website",
   publishedAt,
   updatedAt,
   category,
 } = Astro.props;
 
-const pageTitle = title === "Lewis Zhou — 持续求解" ? title : `${title} — Lewis Zhou`;
+const text = ui[lang];
+const title = Astro.props.title ?? text.siteTitle;
+const description = Astro.props.description ?? text.siteDescription;
+const image = Astro.props.image ?? (lang === "en" ? "/social-card-en.png" : "/social-card.png");
+const pageTitle = title === text.siteTitle ? title : `${title} — Lewis Zhou`;
 const canonicalURL = Astro.site ? new URL(Astro.url.pathname, Astro.site) : Astro.url;
 const socialImage = Astro.site ? new URL(image, Astro.site) : new URL(image, Astro.url);
 const siteURL = new URL("/", canonicalURL);
-const aboutURL = new URL("/about/", canonicalURL);
+const aboutURL = new URL(paths[lang].about, canonicalURL);
 const personID = `${aboutURL}#person`;
 const websiteID = `${siteURL}#website`;
 
@@ -41,10 +52,10 @@ const graph: Record<string, unknown>[] = [
     "@type": "WebSite",
     "@id": websiteID,
     url: siteURL,
-    name: "Lewis Zhou — 持续求解",
-    alternateName: "Still Solving",
-    description: "把复杂问题，一步步做实。",
-    inLanguage: "zh-CN",
+    name: text.siteTitle,
+    alternateName: lang === "en" ? "持续求解" : "Still Solving",
+    description: text.siteDescription,
+    inLanguage: lang,
     author: { "@id": personID },
   },
 ];
@@ -60,7 +71,7 @@ if (pageType === "article" && publishedAt) {
     datePublished: publishedAt.toISOString(),
     dateModified: (updatedAt ?? publishedAt).toISOString(),
     articleSection: category,
-    inLanguage: "zh-CN",
+    inLanguage: lang,
     author: { "@id": personID },
     publisher: { "@id": personID },
     isPartOf: { "@id": websiteID },
@@ -72,7 +83,7 @@ if (pageType === "article" && publishedAt) {
     url: canonicalURL,
     name: pageTitle,
     description,
-    inLanguage: "zh-CN",
+    inLanguage: lang,
     isPartOf: { "@id": websiteID },
   });
 }
@@ -81,7 +92,7 @@ const structuredData = { "@context": "https://schema.org", "@graph": graph };
 ---
 
 <!doctype html>
-<html lang="zh-CN">
+<html lang={lang}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -91,10 +102,13 @@ const structuredData = { "@context": "https://schema.org", "@graph": graph };
     <meta name="theme-color" content="#f2efe7" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="canonical" href={canonicalURL} />
-    <link rel="alternate" type="application/rss+xml" title="Lewis Zhou" href="/rss.xml" />
+    <link rel="alternate" type="application/rss+xml" title={text.siteTitle} href={paths[lang].rss} />
+    {alternates.map((alternate) => (
+      <link rel="alternate" hreflang={alternate.lang} href={new URL(alternate.href, siteURL)} />
+    ))}
     <meta property="og:type" content={pageType} />
     <meta property="og:site_name" content="Lewis Zhou — 持续求解" />
-    <meta property="og:locale" content="zh_CN" />
+    <meta property="og:locale" content={lang === "en" ? "en_US" : "zh_CN"} />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalURL} />
@@ -113,13 +127,13 @@ const structuredData = { "@context": "https://schema.org", "@graph": graph };
   <body>
     <a class="skip-link" href="#main-content">跳到正文</a>
     <div class="page-shell">
-      <Header />
+      <Header lang={lang} languageHref={alternates.find((alternate) => alternate.lang !== lang)?.href ?? paths[lang === "en" ? "zh-CN" : "en"].home} />
       <main id="main-content">
         <slot />
       </main>
       <footer class="site-footer">
-        <p>Lewis Zhou · Still Solving</p>
-        <p>复杂问题没有捷径，但可以持续求解。</p>
+        <p>{text.footerName}</p>
+        <p>{text.footerLine}</p>
       </footer>
     </div>
   </body>

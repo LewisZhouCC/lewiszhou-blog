@@ -1,18 +1,5 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
+import AboutPage from "../components/pages/AboutPage.astro";
 ---
 
-<BaseLayout title="关于" description="关于 Lewis Zhou 与持续求解。">
-  <section class="about-page">
-    <p class="section-label">About / 关于</p>
-    <h1 class="page-title">Lewis Zhou</h1>
-    <div class="about-grid">
-      <p class="about-statement">我关心复杂系统最终如何变成可以验证、可以交付的真实结果。</p>
-      <div class="about-copy">
-        <p>持续求解是一份个人工作笔记，内容覆盖系统架构、Agent、产品判断与实际构建。</p>
-        <p>这里会明确区分设想、实验、验证与交付。因为一个流程运行成功，不等于用户的问题已经解决；一个设计看起来完整，也不等于它值得被实现。</p>
-        <p>写作不是为复杂增加解释，而是把真正重要的边界、证据和选择留下来。</p>
-      </div>
-    </div>
-  </section>
-</BaseLayout>
+<AboutPage lang="zh-CN" />
