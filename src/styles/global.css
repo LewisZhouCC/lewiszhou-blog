@@ -371,25 +371,25 @@ a { color: inherit; }
 .post-header h1 {
   margin: 2rem 0;
   font-family: var(--display);
-  font-size: clamp(3.6rem, 8vw, 7.2rem);
+  font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 400;
-  line-height: .95;
-  letter-spacing: -.055em;
+  line-height: 1.3;
+  letter-spacing: -.015em;
   text-wrap: balance;
 }
 
 .post-header > p {
   max-width: 37rem;
-  font-family: var(--display);
-  font-size: 1.45rem;
-  line-height: 1.6;
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: var(--muted);
 }
 
 .post-header small { color: var(--muted); }
 
 .prose {
-  margin-top: 5rem;
-  padding-top: 3rem;
+  margin-top: 3rem;
+  padding-top: 2rem;
   border-top: 1px solid var(--ink);
   font-size: 1.05rem;
   line-height: 1.95;
@@ -398,8 +398,39 @@ a { color: inherit; }
 .prose h2 {
   margin: 3.5rem 0 1rem;
   font-family: var(--display);
-  font-size: 2.25rem;
+  font-size: clamp(1.4rem, 2.5vw, 1.75rem);
   font-weight: 400;
+  line-height: 1.45;
+}
+
+.prose table {
+  width: 100%;
+  margin: 1.5rem 0 2rem;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: .95rem;
+  line-height: 1.65;
+}
+
+.prose th,
+.prose td {
+  padding: .85rem 1rem;
+  border: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+.prose th {
+  background: var(--paper-deep);
+  font-weight: 600;
+}
+
+.prose img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 2rem auto;
 }
 
 .prose blockquote {
@@ -468,7 +499,10 @@ a { color: inherit; }
   .topic h3 { margin-top: 3.5rem; }
   .about-grid { grid-template-columns: 1fr; gap: 2rem; }
   .post-page { padding-top: 3rem; }
-  .back-link { margin-bottom: 4rem; }
+  .back-link { margin-bottom: 2rem; }
+  .post-kicker { flex-wrap: wrap; gap: .5rem 1rem; }
+  .prose table { display: block; overflow-x: auto; table-layout: auto; }
+  .prose th, .prose td { min-width: 11rem; }
   .site-footer { display: block; }
 }
 
