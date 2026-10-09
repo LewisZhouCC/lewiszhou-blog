@@ -96,6 +96,9 @@ for (const [canonical, page] of pages) {
 
 if (existsSync(new URL("sitemap-0.xml", dist))) {
   const sitemap = readFileSync(new URL("sitemap-0.xml", dist), "utf8");
+  for (const feed of ["rss.xml", "en/rss.xml"]) {
+    if (!sitemap.includes(`<loc>https://lewiszhou.dev/${feed}</loc>`)) errors.push(`${feed}: feed URL missing from sitemap`);
+  }
   for (const [canonical, file] of canonicals) {
     if (!sitemap.includes(`<loc>${canonical}</loc>`)) errors.push(`${file}: canonical URL missing from sitemap`);
   }

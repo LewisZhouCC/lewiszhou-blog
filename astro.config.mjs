@@ -4,5 +4,7 @@ import sitemap from "@astrojs/sitemap";
 export default defineConfig({
   site: "https://lewiszhou.dev",
   output: "static",
-  integrations: [sitemap()],
+  integrations: [sitemap({
+    customPages: ["https://lewiszhou.dev/rss.xml", "https://lewiszhou.dev/en/rss.xml"],
+  })],
 });
