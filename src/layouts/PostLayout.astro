@@ -13,11 +13,12 @@ interface Props {
   publishedAt: Date;
   updatedAt?: Date;
   category: string;
+  categoryHref: string;
   lang: Locale;
   alternates: Alternate[];
 }
 
-const { title, description, publishedAt, updatedAt, category, lang, alternates } = Astro.props;
+const { title, description, publishedAt, updatedAt, category, categoryHref, lang, alternates } = Astro.props;
 const text = ui[lang];
 const formatDate = (date: Date) => new Intl.DateTimeFormat(lang === "en" ? "en-US" : "zh-CN", {
   year: "numeric",
@@ -40,7 +41,7 @@ const formatDate = (date: Date) => new Intl.DateTimeFormat(lang === "en" ? "en-U
     <header class="post-header">
       <a class="back-link" href={paths[lang].writing}>{text.backToWriting}</a>
       <div class="post-kicker">
-        <span><a href="/about/" rel="author">Lewis Zhou</a> · {category}</span>
+        <span><a href={paths[lang].about} rel="author">Lewis Zhou</a> · <a href={categoryHref}>{category}</a></span>
         <time datetime={publishedAt.toISOString()}>{formatDate(publishedAt)}</time>
       </div>
       <h1>{title}</h1>

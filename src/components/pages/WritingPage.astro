@@ -1,16 +1,24 @@
 ---
 import { getCollection } from "astro:content";
-import { categoryLabels, paths, ui, type Locale } from "../../i18n";
+import { categoryLabels, paths, ui, type Category, type Locale } from "../../i18n";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
-interface Props { lang: Locale; }
-const { lang } = Astro.props;
+interface Props { lang: Locale; category?: Category; }
+const { lang, category } = Astro.props;
 const text = ui[lang];
 const localePaths = paths[lang];
 const otherLang: Locale = lang === "en" ? "zh-CN" : "en";
 
-const posts = (await getCollection("writing", ({ data }) => !data.draft && data.lang === lang))
+const allPosts = (await getCollection("writing", ({ data }) => !data.draft && data.lang === lang))
   .sort((a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf());
+
+const topics = (Object.keys(categoryLabels[lang]) as Category[])
+  .filter((topic) => allPosts.some((post) => post.data.category === topic));
+const posts = category ? allPosts.filter((post) => post.data.category === category) : allPosts;
+const title = category ? `${categoryLabels[lang][category]} · ${text.navWriting}` : text.navWriting;
+const description = category
+  ? (lang === "en" ? `Lewis Zhou's writing on ${categoryLabels[lang][category]}.` : `Lewis Zhou 关于${categoryLabels[lang][category]}的文章。`)
+  : (lang === "en" ? "Lewis Zhou's writing on systems, agents, product decisions, and building in practice." : "Lewis Zhou 关于系统、Agent、产品判断与构建过程的文章。");
 
 const formatDate = (date: Date) => new Intl.DateTimeFormat(lang === "en" ? "en-US" : "zh-CN", {
   year: "numeric",
@@ -21,17 +29,23 @@ const formatDate = (date: Date) => new Intl.DateTimeFormat(lang === "en" ? "en-U
 
 <BaseLayout
   lang={lang}
-  title={text.navWriting}
-  description={lang === "en" ? "Lewis Zhou's writing on systems, agents, product decisions, and building in practice." : "Lewis Zhou 关于系统、Agent、产品判断与构建过程的文章。"}
+  title={title}
+  description={description}
   alternates={[
-    { lang, href: localePaths.writing },
-    { lang: otherLang, href: paths[otherLang].writing },
+    { lang, href: category ? localePaths.topic(category) : localePaths.writing },
+    { lang: otherLang, href: category ? paths[otherLang].topic(category) : paths[otherLang].writing },
   ]}
 >
   <section class="writing-page">
     <p class="section-label">{text.writingLabel}</p>
-    <h1 class="page-title">{text.writingTitle}</h1>
-    <p class="page-intro">{text.writingIntro}</p>
+    <h1 class="page-title">{category ? categoryLabels[lang][category] : text.writingTitle}</h1>
+    {category ? <p class="topic-total">{text.topicCount(posts.length)}</p> : <p class="page-intro">{text.writingIntro}</p>}
+    <nav class="topic-nav" aria-label={text.topicsTitle}>
+      <a href={localePaths.writing} aria-current={!category ? "page" : undefined}>{text.allTopics}</a>
+      {topics.map((topic) => (
+        <a href={localePaths.topic(topic)} aria-current={category === topic ? "page" : undefined}>{categoryLabels[lang][topic]}</a>
+      ))}
+    </nav>
     <div class="post-list">
       {posts.map((post, index) => (
         <a class="post-row" href={localePaths.post(post.data.urlSlug)}>

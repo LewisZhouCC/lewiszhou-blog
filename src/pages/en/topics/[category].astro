@@ -1,0 +1,16 @@
+---
+import { getCollection } from "astro:content";
+import WritingPage from "../../../components/pages/WritingPage.astro";
+import type { Category } from "../../../i18n";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("writing", ({ data }) => !data.draft && data.lang === "en");
+  return [...new Set(posts.map((post) => post.data.category))]
+    .map((category) => ({ params: { category }, props: { category } }));
+}
+
+interface Props { category: Category; }
+const { category } = Astro.props;
+---
+
+<WritingPage lang="en" category={category} />
