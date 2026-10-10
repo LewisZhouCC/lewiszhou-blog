@@ -83,6 +83,13 @@ for (const file of htmlFiles) {
   }
 }
 
+for (const file of htmlFiles) {
+  const html = readFileSync(join(dist.pathname, file), "utf8");
+  for (const match of html.matchAll(/href="((?:\/en)?\/topics\/[^"?#]+)"/g)) {
+    if (!pages.has(`https://lewiszhou.dev${match[1]}`)) errors.push(`${file}: topic link does not resolve to a built page: ${match[1]}`);
+  }
+}
+
 for (const [canonical, page] of pages) {
   for (const [alternateLang, alternateURL] of Object.entries(page.hreflangs)) {
     const target = pages.get(alternateURL);

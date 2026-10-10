@@ -18,6 +18,6 @@ const translations = await getCollection("writing", ({ data }) => !data.draft &&
 const alternates = translations.map((entry) => ({ lang: entry.data.lang, href: paths[entry.data.lang].post(entry.data.urlSlug) }));
 ---
 
-<PostLayout {...post.data} category={categoryLabels[post.data.lang][post.data.category]} alternates={alternates}>
+<PostLayout {...post.data} category={categoryLabels[post.data.lang][post.data.category]} categoryHref={paths[post.data.lang].topic(post.data.category)} alternates={alternates}>
   <Content />
 </PostLayout>
