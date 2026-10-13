@@ -1,4 +1,8 @@
 /about / 301
 /about/ / 301
-/en/about /en/ 301
-/en/about/ /en/ 301
+/zh/about /zh/ 301
+/zh/about/ /zh/ 301
+/en/about / 301
+/en/about/ / 301
+/en / 301
+/en/* /:splat 301

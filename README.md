@@ -34,7 +34,7 @@ draft: false
 ---
 ```
 
-中文文章保留在默认路由 `/writing/:slug/`，英文文章发布到 `/en/writing/:slug/`。只有真实存在的翻译页面才应互相声明 `hreflang`。
+英文为默认语言，文章发布到 `/writing/:slug/`；中文文章发布到 `/zh/writing/:slug/`。旧 `/en/` 路径通过 Cloudflare Pages 301 重定向到无前缀路径。只有真实存在的翻译页面才应互相声明 `hreflang`。
 
 ## Cloudflare Pages
 

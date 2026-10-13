@@ -21,7 +21,7 @@ interface Props {
 }
 
 const {
-  lang = "zh-CN",
+  lang = "en",
   alternates = [],
   pageType = "website",
   publishedAt,
@@ -108,7 +108,7 @@ const structuredData = { "@context": "https://schema.org", "@graph": graph };
       <link rel="alternate" hreflang={alternate.lang} href={new URL(alternate.href, siteURL)} />
     ))}
     <meta property="og:type" content={pageType} />
-    <meta property="og:site_name" content="Lewis Zhou — 持续求解" />
+    <meta property="og:site_name" content={text.siteTitle} />
     <meta property="og:locale" content={lang === "en" ? "en_US" : "zh_CN"} />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
@@ -126,7 +126,7 @@ const structuredData = { "@context": "https://schema.org", "@graph": graph };
     <title>{pageTitle}</title>
   </head>
   <body>
-    <a class="skip-link" href="#main-content">跳到正文</a>
+    <a class="skip-link" href="#main-content">{lang === "en" ? "Skip to content" : "跳到正文"}</a>
     <div class="page-shell">
       <Header lang={lang} languageHref={alternates.find((alternate) => alternate.lang !== lang)?.href ?? paths[lang === "en" ? "zh-CN" : "en"].home} />
       <main id="main-content">
