@@ -4,18 +4,18 @@ export type Category = "systems" | "agents" | "product" | "build";
 
 export const paths = {
   "zh-CN": {
+    home: "/zh/",
+    writing: "/zh/writing/",
+    rss: "/zh/rss.xml",
+    post: (slug: string) => `/zh/writing/${slug}/`,
+    topic: (category: Category) => `/zh/topics/${category}/`,
+  },
+  en: {
     home: "/",
     writing: "/writing/",
     rss: "/rss.xml",
     post: (slug: string) => `/writing/${slug}/`,
     topic: (category: Category) => `/topics/${category}/`,
-  },
-  en: {
-    home: "/en/",
-    writing: "/en/writing/",
-    rss: "/en/rss.xml",
-    post: (slug: string) => `/en/writing/${slug}/`,
-    topic: (category: Category) => `/en/topics/${category}/`,
   },
 } as const;
 

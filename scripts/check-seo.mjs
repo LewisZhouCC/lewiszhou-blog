@@ -9,7 +9,7 @@ for (const file of ["robots.txt", "sitemap-index.xml", "sitemap-0.xml"]) {
   if (!existsSync(new URL(file, dist))) errors.push(`Missing ${file}`);
 }
 
-for (const file of ["rss.xml", "en/rss.xml"]) {
+for (const file of ["rss.xml", "zh/rss.xml"]) {
   if (!existsSync(new URL(file, dist))) errors.push(`Missing ${file}`);
 }
 
@@ -33,7 +33,7 @@ for (const file of htmlFiles) {
   const description = html.match(/<meta name="description" content="(.*?)"/s)?.[1]?.trim();
   const canonical = html.match(/<link rel="canonical" href="(.*?)"/s)?.[1]?.trim();
   const htmlLang = html.match(/<html lang="(.*?)"/)?.[1]?.trim();
-  const expectedLang = file.startsWith("en/") ? "en" : "zh-CN";
+  const expectedLang = file.startsWith("zh/") ? "zh-CN" : "en";
   const h1Count = (html.match(/<h1\b/g) ?? []).length;
   const jsonScripts = [...html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/gs)];
   const hreflangs = Object.fromEntries(
@@ -76,7 +76,7 @@ for (const file of htmlFiles) {
   if (!hreflangs[otherLang]) errors.push(`${file}: missing ${otherLang} alternate`);
   if (canonical) pages.set(canonical, { file, lang: expectedLang, hreflangs });
 
-  if (file.startsWith("writing/") && file !== "writing/index.html") {
+  if (/^(?:zh\/)?writing\/.+\/index\.html$/.test(file)) {
     if (!html.includes('property="og:type" content="article"')) errors.push(`${file}: missing article Open Graph type`);
     if (!html.includes('"@type":"BlogPosting"')) errors.push(`${file}: missing BlogPosting schema`);
     if (!html.includes('rel="author"')) errors.push(`${file}: missing visible author link`);
@@ -85,7 +85,7 @@ for (const file of htmlFiles) {
 
 for (const file of htmlFiles) {
   const html = readFileSync(join(dist.pathname, file), "utf8");
-  for (const match of html.matchAll(/href="((?:\/en)?\/topics\/[^"?#]+)"/g)) {
+  for (const match of html.matchAll(/href="((?:\/zh)?\/topics\/[^"?#]+)"/g)) {
     if (!pages.has(`https://lewiszhou.dev${match[1]}`)) errors.push(`${file}: topic link does not resolve to a built page: ${match[1]}`);
   }
 }
@@ -103,13 +103,35 @@ for (const [canonical, page] of pages) {
 
 if (existsSync(new URL("sitemap-0.xml", dist))) {
   const sitemap = readFileSync(new URL("sitemap-0.xml", dist), "utf8");
-  for (const feed of ["rss.xml", "en/rss.xml"]) {
+  for (const feed of ["rss.xml", "zh/rss.xml"]) {
     if (!sitemap.includes(`<loc>https://lewiszhou.dev/${feed}</loc>`)) errors.push(`${feed}: feed URL missing from sitemap`);
   }
   for (const [canonical, file] of canonicals) {
     if (!sitemap.includes(`<loc>${canonical}</loc>`)) errors.push(`${file}: canonical URL missing from sitemap`);
   }
 }
+
+for (const [file, lang] of [["rss.xml", "en"], ["zh/rss.xml", "zh-CN"]]) {
+  if (!existsSync(new URL(file, dist))) continue;
+  const feed = readFileSync(new URL(file, dist), "utf8");
+  const items = [...feed.matchAll(/<item>(.*?)<\/item>/gs)];
+  if (!items.length) errors.push(`${file}: feed has no articles`);
+  for (const [, item] of items) {
+    const link = item.match(/<link>(.*?)<\/link>/s)?.[1];
+    if (pages.get(link)?.lang !== lang) errors.push(`${file}: article link does not resolve to a ${lang} page: ${link}`);
+  }
+}
+
+const redirectsFile = new URL("_redirects", dist);
+if (!existsSync(redirectsFile)) {
+  errors.push("Missing legacy English redirects");
+} else {
+  const redirects = readFileSync(redirectsFile, "utf8").split("\n");
+  for (const rule of ["/en / 301", "/en/* /:splat 301"]) {
+    if (!redirects.includes(rule)) errors.push(`Missing redirect: ${rule}`);
+  }
+}
+if (existsSync(new URL("en/", dist))) errors.push("Legacy /en/ pages should redirect instead of being built");
 
 if (errors.length) {
   console.error(`SEO checks failed:\n- ${errors.join("\n- ")}`);

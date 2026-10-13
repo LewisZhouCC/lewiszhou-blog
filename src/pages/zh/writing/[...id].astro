@@ -4,11 +4,14 @@ import { categoryLabels, paths } from "../../../i18n";
 import PostLayout from "../../../layouts/PostLayout.astro";
 
 export async function getStaticPaths() {
-  const posts = await getCollection("writing", ({ data }) => !data.draft && data.lang === "en");
+  const posts = await getCollection("writing", ({ data }) => !data.draft && data.lang === "zh-CN");
   return posts.map((post) => ({ params: { id: post.data.urlSlug }, props: { post } }));
 }
 
-interface Props { post: CollectionEntry<"writing">; }
+interface Props {
+  post: CollectionEntry<"writing">;
+}
+
 const { post } = Astro.props;
 const { Content } = await render(post);
 const translations = await getCollection("writing", ({ data }) => !data.draft && data.translationKey === post.data.translationKey);

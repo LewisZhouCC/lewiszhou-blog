@@ -20,7 +20,7 @@ const nav = [
     <span class="wordmark-name">Lewis Zhou</span>
     <span class="wordmark-mark" aria-hidden="true"></span>
   </a>
-  <nav aria-label="主导航">
+  <nav aria-label={lang === "en" ? "Main navigation" : "主导航"}>
     {nav.map((item) => (
       <a href={item.href} aria-current={pathname.startsWith(item.href) ? "page" : undefined}>
         {item.label}
