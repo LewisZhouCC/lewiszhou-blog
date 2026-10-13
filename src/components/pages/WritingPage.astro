@@ -47,10 +47,12 @@ const formatDate = (date: Date) => new Intl.DateTimeFormat(lang === "en" ? "en-U
       ))}
     </nav>
     <div class="post-list">
-      {posts.map((post, index) => (
+      {posts.map((post) => (
         <a class="post-row" href={localePaths.post(post.data.urlSlug)}>
-          <span class="index-no">{String(index + 1).padStart(2, "0")}</span>
-          <h2>{post.data.title}</h2>
+          <div class="post-summary">
+            <h2>{post.data.title}</h2>
+            <p>{post.data.description}</p>
+          </div>
           <span class="post-meta">
             <span>{categoryLabels[lang][post.data.category]}</span>
             <time datetime={post.data.publishedAt.toISOString()}>{formatDate(post.data.publishedAt)}</time>

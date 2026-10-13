@@ -48,9 +48,8 @@ const topics = (Object.keys(categoryLabels[lang]) as Category[])
       <a class="text-link" href={localePaths.writing}>{text.allWriting}</a>
     </div>
     <div class="post-list home-post-list">
-      {posts.slice(0, 4).map((post, index) => (
+      {posts.slice(0, 4).map((post) => (
         <a class="post-row" href={localePaths.post(post.data.urlSlug)}>
-          <span class="index-no">{String(index + 1).padStart(2, "0")}</span>
           <div class="post-summary">
             <h3>{post.data.title}</h3>
             <p>{post.data.description}</p>
@@ -68,9 +67,8 @@ const topics = (Object.keys(categoryLabels[lang]) as Category[])
     <p class="section-label">{text.topicsLabel}</p>
     <h2 class="page-title" id="topics-title">{text.topicsTitle}</h2>
     <div class="topics-grid">
-      {topics.map((topic, index) => (
+      {topics.map((topic) => (
         <a class="topic" href={localePaths.topic(topic.category)}>
-          <span class="index-no">0{index + 1}</span>
           <h3>{categoryLabels[lang][topic.category]}</h3>
           <p>{text.topicCount(topic.count)} <span aria-hidden="true">↗</span></p>
         </a>
