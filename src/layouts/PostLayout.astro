@@ -41,7 +41,7 @@ const formatDate = (date: Date) => new Intl.DateTimeFormat(lang === "en" ? "en-U
     <header class="post-header">
       <a class="back-link" href={paths[lang].writing}>{text.backToWriting}</a>
       <div class="post-kicker">
-        <span><a href={paths[lang].about} rel="author">Lewis Zhou</a> · <a href={categoryHref}>{category}</a></span>
+        <span><a href={paths[lang].home} rel="author">Lewis Zhou</a> · <a href={categoryHref}>{category}</a></span>
         <time datetime={publishedAt.toISOString()}>{formatDate(publishedAt)}</time>
       </div>
       <h1>{title}</h1>
