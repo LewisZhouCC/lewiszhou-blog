@@ -95,6 +95,8 @@ html[lang="en"] .post-header h1 { line-height: 1.25; }
 
 .site-footer { display: flex; justify-content: space-between; gap: 2rem; padding: 2rem 0 3rem; font-family: var(--mono); font-size: .66rem; color: var(--muted); border-top: 1px solid var(--line); }
 
+.site-footer a { text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: .2em; }
+
 @media (max-width: 760px) {
   .page-shell { width: calc(100% - 40px); }
   .hero { padding-top: 2rem; }

@@ -47,6 +47,7 @@ const graph: Record<string, unknown>[] = [
     "@id": personID,
     name: "Lewis Zhou",
     url: authorURL,
+    sameAs: ["https://x.com/BartXVs"],
   },
   {
     "@type": "WebSite",
@@ -132,7 +133,7 @@ const structuredData = { "@context": "https://schema.org", "@graph": graph };
         <slot />
       </main>
       <footer class="site-footer">
-        <p>{text.footerName}</p>
+        <p>{text.footerName} · <a href="https://x.com/BartXVs" rel="me" aria-label={lang === "en" ? "Lewis Zhou on X (@BartXVs)" : "Lewis Zhou 的 X（@BartXVs）"}>X ↗</a></p>
         <p>{text.footerLine}</p>
       </footer>
     </div>
