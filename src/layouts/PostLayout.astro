@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
+import { socialCardPath } from "../lib/social-card";
 import { paths, ui, type Locale } from "../i18n";
 
 interface Alternate {
@@ -9,6 +10,7 @@ interface Alternate {
 
 interface Props {
   title: string;
+  urlSlug: string;
   description: string;
   publishedAt: Date;
   updatedAt?: Date;
@@ -29,6 +31,7 @@ const formatDate = (date: Date) => new Intl.DateTimeFormat(lang === "en" ? "en-U
 
 <BaseLayout
   title={title}
+  image={socialCardPath(Astro.props)}
   description={description}
   lang={lang}
   alternates={alternates}
