@@ -26,6 +26,7 @@ const titles = new Map();
 const descriptions = new Map();
 const canonicals = new Map();
 const pages = new Map();
+const articleImages = new Map();
 
 for (const file of htmlFiles) {
   const html = readFileSync(join(dist.pathname, file), "utf8");
@@ -36,6 +37,7 @@ for (const file of htmlFiles) {
   const expectedLang = file.startsWith("zh/") ? "zh-CN" : "en";
   const h1Count = (html.match(/<h1\b/g) ?? []).length;
   const jsonScripts = [...html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/gs)];
+  let articleImage;
   const hreflangs = Object.fromEntries(
     [...html.matchAll(/<link rel="alternate" hreflang="(.*?)" href="(.*?)"/g)]
       .map((match) => [match[1], match[2]]),
@@ -65,6 +67,7 @@ for (const file of htmlFiles) {
     try {
       const data = JSON.parse(match[1]);
       const pageNode = data["@graph"]?.find((node) => node["@type"] === "WebPage" || node["@type"] === "BlogPosting");
+      if (pageNode?.["@type"] === "BlogPosting") articleImage = pageNode.image;
       if (pageNode?.inLanguage !== expectedLang) errors.push(`${file}: JSON-LD language does not match ${expectedLang}`);
     } catch {
       errors.push(`${file}: invalid JSON-LD`);
@@ -80,6 +83,25 @@ for (const file of htmlFiles) {
     if (!html.includes('property="og:type" content="article"')) errors.push(`${file}: missing article Open Graph type`);
     if (!html.includes('"@type":"BlogPosting"')) errors.push(`${file}: missing BlogPosting schema`);
     if (!html.includes('rel="author"')) errors.push(`${file}: missing visible author link`);
+    const image = html.match(/<meta property="og:image" content="(.*?)"/)?.[1];
+    const twitterImage = html.match(/<meta name="twitter:image" content="(.*?)"/)?.[1];
+    if (!image?.startsWith(`https://lewiszhou.dev/social/${expectedLang}/`) || !image.endsWith(".png")) {
+      errors.push(`${file}: missing article-specific social image`);
+    } else {
+      if (articleImages.has(image)) errors.push(`${file}: shares a social image with ${articleImages.get(image)}`);
+      articleImages.set(image, file);
+      const imageFile = new URL(new URL(image).pathname.slice(1), dist);
+      if (!existsSync(imageFile)) {
+        errors.push(`${file}: social image does not exist`);
+      } else {
+        const png = readFileSync(imageFile);
+        if (png.length < 24 || png.subarray(0, 8).toString("hex") !== "89504e470d0a1a0a" || png.readUInt32BE(16) !== 1200 || png.readUInt32BE(20) !== 630 || png.length >= 5_000_000) {
+          errors.push(`${file}: social image must be a 1200x630 PNG under 5 MB`);
+        }
+      }
+    }
+    if (twitterImage !== image) errors.push(`${file}: Twitter and Open Graph images differ`);
+    if (articleImage !== image) errors.push(`${file}: BlogPosting image does not match the social image`);
   }
 }
 
