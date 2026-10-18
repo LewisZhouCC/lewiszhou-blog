@@ -1,0 +1,35 @@
+---
+import { getCollection, render, type CollectionEntry } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+export async function getStaticPaths() {
+  if (!import.meta.env.DEV) return [];
+  const posts = await getCollection("writing", ({ data }) => data.lang === "zh-CN");
+  return posts.map((post) => ({ params: { id: post.data.urlSlug }, props: { post } }));
+}
+interface Props { post: CollectionEntry<"writing"> }
+const { post } = Astro.props;
+const { Content } = await render(post);
+---
+
+<BaseLayout title={`本地预览：${post.data.title}`} description={post.data.description} lang="zh-CN" noindex>
+  <article class="post-page">
+    <aside class="preview-banner">
+      <span>本地文章预览</span>
+      <nav aria-label="交互实验"><a href="#model-bottleneck-title">认知瓶颈</a><a href="#model-delegation-title">委派价值</a><a href="#model-staffing-title">效率与人数</a></nav>
+    </aside>
+    <header class="post-header">
+      <div class="post-kicker"><span>Lewis Zhou · Agent 与认知资源</span><span>2026 年 10 月 18 日</span></div>
+      <h1>{post.data.title}</h1>
+      <p>{post.data.description}</p>
+    </header>
+    <div class="prose"><Content /></div>
+  </article>
+</BaseLayout>
+
+<style>
+  .preview-banner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: .7rem; margin-bottom: 2rem; padding: .9rem 0; border-block: 1px solid var(--line); font-size: .73rem; color: var(--muted); }
+  .preview-banner > span { color: var(--blue); }
+  nav { display: flex; gap: 1rem; }
+  nav a { text-underline-offset: .2em; }
+</style>

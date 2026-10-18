@@ -103,6 +103,19 @@ for (const file of htmlFiles) {
     if (twitterImage !== image) errors.push(`${file}: Twitter and Open Graph images differ`);
     if (articleImage !== image) errors.push(`${file}: BlogPosting image does not match the social image`);
   }
+
+  const experiments = [...html.matchAll(/<article-model\b([^>]*)>(.*?)<\/article-model>/gs)];
+  for (const [, attributes, body] of experiments) {
+    if (!attributes.includes(`lang="${expectedLang}"`)) errors.push(`${file}: interactive model language does not match the page`);
+    if ((body.match(/type="range"/g) ?? []).length !== 1) errors.push(`${file}: each model must have exactly one slider`);
+    if (!body.includes("<noscript>")) errors.push(`${file}: interactive model is missing its static fallback explanation`);
+    if (expectedLang === "en" && /\p{Script=Han}/u.test(body)) errors.push(`${file}: English model contains untranslated Chinese copy`);
+  }
+  const modelScript = html.match(/<script[^>]+src="([^"]*ArticleModel[^"]*\.js)"/);
+  if (experiments.length && (!modelScript || !existsSync(join(dist.pathname, modelScript[1])))) {
+    errors.push(`${file}: interactive model client script is missing`);
+  }
+  if (!experiments.length && modelScript) errors.push(`${file}: noninteractive page loads the model script`);
 }
 
 for (const file of htmlFiles) {
