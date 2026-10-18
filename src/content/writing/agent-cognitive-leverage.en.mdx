@@ -1,0 +1,257 @@
+---
+title: Why my team still hires junior engineers as agents get stronger
+description: AI makes implementation cheaper. Engineering headcount still depends on valuable task demand, human judgment and team structure. Three interactive experiments explore when those relationships change.
+lang: en
+urlSlug: agent-cognitive-leverage
+translationKey: agent-cognitive-leverage
+publishedAt: 2026-10-18
+category: agents
+draft: false
+---
+
+import ArticleModel from "../../components/interactive/ArticleModel.astro";
+
+AI lowers the cost of implementing software. How many engineers a company needs also depends on valuable task demand and the human attention available to understand, judge and accept the results.
+
+I recently read Anthropic's [*How employment is changing at Anthropic*](https://www.anthropic.com/research/employment-at-anthropic).
+
+One figure stood out: junior technical hires fell from 27% of technical hiring in early 2025 to 9%.
+
+An immediate interpretation is that AI has become capable enough to remove the need for junior engineers.
+
+Reading the report, though, I kept thinking about my own team.
+
+My team's resources do not compare with Anthropic's. But in day-to-day development, access to AI compute is relatively abundant. Engineers regularly use models such as Claude and GPT, and coding agents are embedded in the development process.
+
+Yet the team still needs engineers. It is still hiring junior developers and interns.
+
+That raises a question:
+
+**If AI can do more engineering work, why does my team still need more people?**
+
+My view is that engineering demand in the AI era depends on how much compute a company can turn into valuable results, as well as how much work AI replaces.
+
+Human cognitive capacity may be becoming a scarce resource in that conversion.
+
+## 1. Compute can scale; individual attention has limits
+
+Anthropic's report includes two other useful figures.
+
+By August 2026, employee-directed interactive agents were accumulating roughly six times as many working hours as their human handlers.
+
+At the same time, around 80% of interactive agent sessions' wall-clock time was spent waiting for human input.
+
+These are different measures: runtime is not output, and waiting for input is not a measure of wasted compute.
+
+The combination can seem contradictory. Agents can work on many tasks in parallel, while people struggle to process their results and requests quickly enough.
+
+It matches my experience with coding agents.
+
+I can launch five or ten agents to build features, fix bugs, write tests and research designs. But can I understand ten tasks at once?
+
+When they return results, request approval, encounter architectural conflicts or need a decision about business boundaries, I still have to switch contexts one by one.
+
+The models' execution capacity has grown. My understanding, judgment and attention have not grown at the same rate.
+
+When compute becomes abundant, the bottleneck may shift from execution to human cognitive capacity.
+
+There is a distinction here:
+
+**An individual's cognitive capacity is limited, but an organization's supply of human attention is not fixed.**
+
+Hiring, division of labor, automated verification and organizational design can increase the number of problems a team can handle at once.
+
+Under some conditions, an additional engineer's value may therefore come less from the code they write personally and more from their ability to turn otherwise idle, waiting or poorly used AI capacity into reliable output.
+
+I provisionally call this **cognitive leverage**: the amount of valuable, reliably accepted work produced per hour of human attention.
+
+<ArticleModel kind="bottleneck" lang="en" />
+
+## 2. Junior engineers can still create value
+
+I find it useful to divide engineering work into three categories:
+
+- **A tasks** require senior engineers: core architecture, complex system decisions and major technical risk judgments.
+- **B tasks** require mid-level or senior engineers: routine system design, cross-module development and difficult debugging.
+- **C tasks** can be completed and accepted independently by junior engineers: bounded features, standardized changes and tasks with clear acceptance criteria.
+
+These categories describe who can independently judge and accept the outcome. They are not measures of code volume or implementation difficulty.
+
+Before AI, senior engineers also wrote plenty of ordinary application code.
+
+AI lowers the implementation cost of that work. It does not eliminate the human attention required to understand requirements, verify results and handle exceptions.
+
+Consider a simplified example. A senior engineer spends a dozen or more hours each week on C tasks. If a junior engineer can complete and accept those tasks with agent assistance and limited guidance, the senior engineer can redirect that time toward A tasks that require their expertise.
+
+From the company's perspective, the junior engineer creates value in two ways: the work they deliver directly and the senior engineering capacity they release.
+
+**Keeping senior engineers occupied with work that requires less judgment can be an expensive allocation of scarce attention.**
+
+This argument has a condition. The junior engineer must be able to complete and accept the tasks independently, and the guidance cost must remain below the benefit.
+
+If agents can already complete and reliably verify all C tasks automatically, hiring junior engineers for those tasks may offer no economic advantage.
+
+AI is therefore neither inherently good nor inherently bad for junior roles. It changes the boundaries between categories of work and the marginal value of different people.
+
+<ArticleModel kind="delegation" lang="en" />
+
+## 3. Higher productivity does not necessarily mean fewer people
+
+One analogy comes to mind.
+
+Suppose I am running a race and suddenly get a Roadster with a launch boost. I can move much faster.
+
+If my competitors get the same car, competition continues. The speed and standard of the race have changed.
+
+Something similar may be happening in software.
+
+Suppose an engineer's productivity becomes three times its original level. Delivering exactly the same amount of work would, in theory, require one-third as many people.
+
+That calculation assumes the amount of work the company needs to do is fixed.
+
+In practice, a company may have a backlog of new product directions, features previously rejected as too expensive, technical debt, quality improvements, better user experiences and unexplored markets.
+
+By lowering the cost of solving problems, AI can make some previously uneconomic work worth doing.
+
+If the company can turn that capacity into a competitive advantage, its demand for valuable tasks may grow.
+
+A simplified relationship is:
+
+**Required headcount ≈ valuable task demand / effective output per person**
+
+If productivity becomes three times its original level while demand becomes twice its original level, required headcount may fall. If demand becomes five times its original level, the company may need more people.
+
+That is why I am skeptical of a direct inference from a given efficiency gain to a proportional reduction in engineering headcount.
+
+For growing companies with opportunities still to explore, AI may increase both output per person and the need for people.
+
+But economically valuable problems are finite, even if the supply of conceivable problems seems endless.
+
+Sustained expansion still depends on market demand, product value and the company's ability to turn capacity into revenue.
+
+Anthropic itself is a counterexample to treating growth as sufficient: it is expanding quickly while the share of junior technical hiring is falling.
+
+Growth alone cannot determine hiring needs. Another question matters: **which levels of judgment do the new tasks require?**
+
+<ArticleModel kind="staffing" lang="en" />
+
+## 4. The best engineering mix can change over time
+
+Return to the A, B and C categories.
+
+Suppose engineers at three levels of seniority can each handle different ranges of tasks with AI assistance.
+
+The company then needs to optimize more than total headcount. How many senior, mid-level and junior engineers should it hire to maximize organizational output?
+
+This is a dynamic optimization problem. Relevant factors include:
+
+- **Task demand:** the number and value of tasks at each level.
+- **Attention requirements:** how much cognitive effort different engineers need for those tasks.
+- **AI capability:** how much execution it replaces and how much supervision remains.
+- **Operating costs:** pay, compute, communication and coordination.
+- **Talent development:** the cost of training juniors and the future value of their progression.
+
+As models improve, these variables change.
+
+Some B tasks may become C tasks. Some C tasks may become fully automated. At the same time, AI may enable the company to undertake more complex A tasks that were previously out of reach.
+
+The best staffing mix is therefore not fixed.
+
+One company may benefit from many senior engineers and a few juniors. Another may work better with a small number of architecture leads and a larger group of junior and mid-level engineers who can independently manage standardized agent tasks.
+
+The answer depends on the business model, task distribution, verification capability and growth rate.
+
+There is also a longer-term question. If companies keep shrinking junior roles to optimize the current workforce, where will future senior engineers come from?
+
+Developing future talent is itself an investment with a long-term return.
+
+## 5. People can change the cost of solving a problem
+
+This leads me to a more abstract question.
+
+Could each engineering problem be understood as a task that requires resources to solve?
+
+How much model inference, how many tool calls, searches and retries are needed to reach a correct result with sufficient probability?
+
+When repeated attempts fail, I often reach for more AI compute. But human judgment can change the process of solving the problem.
+
+A senior engineer might spend half an hour breaking a complex problem into bounded subproblems and defining clear acceptance criteria. Work that previously required repeated agent trial and error may then require fewer attempts.
+
+A reliable automated verifier can also reduce the need to read every line of an implementation. A person can focus on the verification evidence and the key risks.
+
+There is therefore no single compute cost for a problem independent of its tools, verification conditions and form of human participation.
+
+A more useful view is that **compute and human cognitive effort jointly define a trade-off in the cost of solving a problem**.
+
+Some problems benefit from more compute. Others need human judgment, real-world feedback or a better verification mechanism.
+
+The ability to combine these resources may become a central competitive capability for an AI-native company.
+
+I am interested in how a company can use less human attention to turn agent work into reliable, economically valuable results.
+
+## 6. Could companies have an optimal team size?
+
+Another connection comes from population ecology.
+
+Biology has a concept called the [Allee effect](https://doi.org/10.2307/3547011).
+
+At low population sizes, individuals may struggle to cooperate, find mates or benefit from group protection. Adding more members can improve their chances of survival or reproduction.
+
+At high population sizes, resource competition can instead limit growth. High-density negative effects and low-density Allee effects are distinct mechanisms.
+
+When both are present, per-capita net population growth may be highest at an intermediate size or density.
+
+Could engineering teams exhibit something analogous?
+
+Here, population density is an analogy for team size within a given business scope and way of coordinating work.
+
+A team of only a few people may have abundant compute but too few domain owners to use agents' execution capacity effectively.
+
+As the team grows, a useful division of labor can emerge. Different engineers can manage agents in their own domains, allowing work previously constrained by one person's attention to proceed in parallel.
+
+If the team continues to grow, coordination, code integration, communication and decision costs may eventually outweigh the benefit of another person.
+
+This resembles the logic of economies and diseconomies of scale.
+
+However, the team size with the highest output per person need not be the one with the highest net benefit for the company. The latter also depends on total output, people and compute costs, and real demand for the additional output.
+
+Engineering demand may therefore depend on the organization's current size and the marginal value of another person, as well as on the amount of work available.
+
+Does Anthropic's declining share of junior technical hiring partly reflect its current scale and division of labor? I do not have enough data to judge.
+
+It does suggest a hypothesis worth investigating:
+
+**Both optimal engineering headcount and the best mix of seniority may change with AI capability, task demand and the organization's current size.**
+
+AI may also move that optimal range over time.
+
+It can help fewer people form an effective team, and it may allow a company to coordinate a larger team at lower cost.
+
+The question I would like to investigate is how AI changes the best organizational structure at different team sizes, rather than trying to assign a single number to the engineers it will replace.
+
+## Returning to the hiring question
+
+Anthropic is hiring a smaller proportion of junior technical staff. My team is still hiring junior engineers. These observations need not conflict.
+
+Companies have different task distributions, stages of growth, degrees of automation and organizational capabilities.
+
+AI may already have automated much of the work suitable for juniors at one company. At another, it may enable more junior engineers to take independent responsibility for tasks and help expand capacity.
+
+I would not conclude that junior engineers will disappear. Nor would I assume that AI must create more jobs.
+
+**AI lowers execution costs. It does not automatically remove the costs of understanding, judgment, verification and coordination.**
+
+As compute becomes abundant, how should a company allocate limited human cognitive capacity to create the most value?
+
+I find that a more useful question than predicting whether a particular level of engineer will disappear.
+
+---
+
+References:
+
+1. Anthropic, *How employment is changing at Anthropic*, October 16, 2026  
+   https://www.anthropic.com/research/employment-at-anthropic
+2. Daron Acemoglu & Pascual Restrepo, *Automation and New Tasks: How Technology Displaces and Reinstates Labor*, 2019  
+   https://www.aeaweb.org/articles?id=10.1257/jep.33.2.3
+3. P. A. Stephens, W. J. Sutherland & R. P. Freckleton, *What Is the Allee Effect?*, Oikos 87(1): 185–190, 1999  
+   https://doi.org/10.2307/3547011

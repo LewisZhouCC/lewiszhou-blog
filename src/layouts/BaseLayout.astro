@@ -18,6 +18,7 @@ interface Props {
   publishedAt?: Date;
   updatedAt?: Date;
   category?: string;
+  noindex?: boolean;
 }
 
 const {
@@ -100,6 +101,7 @@ const structuredData = { "@context": "https://schema.org", "@graph": graph };
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
     <meta name="author" content="Lewis Zhou" />
+    {Astro.props.noindex && <meta name="robots" content="noindex, nofollow" />}
     <meta name="description" content={description} />
     <meta name="theme-color" content="#fafaf9" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />

@@ -1,0 +1,211 @@
+---
+import { getModelDefinition, modelLabels, modelView, chart, plotPoint, linePoints, formatNumber, type ModelKind } from "../../lib/article-models";
+import type { Locale } from "../../i18n";
+interface Props { kind: ModelKind; lang?: Locale }
+const { kind, lang = "zh-CN" } = Astro.props;
+const definition = getModelDefinition(kind, lang);
+const labels = modelLabels[lang];
+const input = definition.input;
+const view = modelView(kind, input.value, lang);
+const marker = plotPoint(...view.marker, view);
+const prefix = `model-${kind}`;
+const bottom = chart.height - chart.bottom;
+const right = chart.width - chart.right;
+---
+
+<article-model data-kind={kind} lang={lang} aria-labelledby={`${prefix}-title`}>
+  <header class="experiment-header">
+    <span class="experiment-kicker">{labels.experiment} / {definition.number}</span>
+    <span class="assumption-tag">{labels.illustrative}</span>
+  </header>
+  <h3 id={`${prefix}-title`}>{definition.title}</h3>
+  <p class="experiment-intro">{definition.intro}</p>
+  <p class="model-context">{definition.context}</p>
+  <div class="experiment-workbench">
+    <form class="model-controls" aria-label={definition.title}>
+      <fieldset disabled>
+        <legend class="sr-only">{labels.adjust}</legend>
+        <div class="model-control">
+          <div class="control-caption">
+            <label for={`${prefix}-${input.name}`}>{input.label}</label>
+            <output for={`${prefix}-${input.name}`}>{formatNumber(input.value)} <small>{input.unit}</small></output>
+          </div>
+          <input id={`${prefix}-${input.name}`} name={input.name} type="range" min={input.min} max={input.max} step={input.step} value={input.value} />
+          <div class="control-ends" aria-hidden="true"><span>{input.min}</span><span>{input.max}</span></div>
+        </div>
+        <div class="model-actions">
+          <button type="reset">{labels.reset}</button>
+          <span>{labels.hint}</span>
+        </div>
+      </fieldset>
+    </form>
+    <div class="model-result" role="status" aria-live="polite" aria-atomic="true">
+      <span class="result-label">{labels.result}</span>
+      <strong data-result>{view.value}</strong>
+      <span class="result-unit">{view.unit}</span>
+      <p data-summary>{view.summary}</p>
+    </div>
+  </div>
+  <figure>
+    <div class="chart-scroll" role="region" tabindex="0" aria-label={`${definition.title} ${labels.chart}`}>
+    <svg viewBox={`0 0 ${chart.width} ${chart.height}`} role="img" aria-label={`${definition.title} ${view.summary} ${view.detail}`}>
+      <g data-y-ticks>
+        {view.yTicks.map((tick) => {
+          const [, y] = plotPoint(0, tick, view);
+          return <g><line class="grid-line" x1={chart.left} x2={right} y1={y} y2={y} /><text class="axis-tick" x={chart.left - 10} y={y + 4} text-anchor="end">{formatNumber(tick)}</text></g>;
+        })}
+      </g>
+      <line class="axis-line" x1={chart.left} x2={right} y1={bottom} y2={bottom} />
+      <line class="axis-line" x1={chart.left} x2={chart.left} y1={chart.top} y2={bottom} />
+      {view.xTicks.map((tick) => {
+        const [x] = plotPoint(tick, 0, view);
+        return <text class="axis-tick" x={x} y={bottom + 21} text-anchor="middle">{tick}</text>;
+      })}
+      <text class="axis-label" x={chart.left} y="16">{view.yLabel}</text>
+      <text class="axis-label" x={right} y={chart.height - 7} text-anchor="end">{view.xLabel}</text>
+      {view.lines.map((line) => <polyline data-line={line.tone} class={`chart-line ${line.tone}`} points={linePoints(line, view)} />)}
+      <line class="marker-guide" data-guide-x x1={marker[0]} x2={marker[0]} y1={marker[1]} y2={bottom} />
+      <line class="marker-guide" data-guide-y x1={chart.left} x2={marker[0]} y1={marker[1]} y2={marker[1]} />
+      {kind === "delegation" && <line class="savings-gap" data-gap x1={marker[0]} x2={marker[0]} y1={plotPoint(0, view.lines[0].points[0][1], view)[1]} y2={marker[1]} />}
+      <circle class="current-point" data-marker cx={marker[0]} cy={marker[1]} r="6" />
+    </svg>
+    </div>
+    <figcaption>
+      <span class="mobile-chart-hint">{labels.scroll}</span>
+      <div class="model-legend">{view.lines.map((line) => <span><i class={line.tone}></i>{line.label}</span>)}<span><i class="point"></i>{labels.current}</span></div>
+      {kind === "delegation" && <span class="chart-caption">{labels.delegation}</span>}
+      {kind === "staffing" && <span class="chart-caption">{labels.staffing}</span>}
+    </figcaption>
+  </figure>
+  <details>
+    <summary>{labels.assumptions}</summary>
+    <div class="model-formula">{definition.formula}</div>
+    <p data-detail>{view.detail}</p>
+    <p>{definition.assumptions}</p>
+    <p>{definition.limit}</p>
+  </details>
+  <noscript><p class="no-script">{labels.noScript}</p></noscript>
+</article-model>
+
+<script>
+  import { getModelDefinition, modelView, plotPoint, linePoints, formatNumber, type ModelKind } from "../../lib/article-models";
+  import type { Locale } from "../../i18n";
+
+  class ArticleModel extends HTMLElement {
+    connectedCallback() {
+      const kind = this.dataset.kind as ModelKind;
+      const lang = this.lang as Locale;
+      const definition = getModelDefinition(kind, lang);
+      const form = this.querySelector("form")!;
+      const input = form.querySelector("input")!;
+      const svg = this.querySelector("svg")!;
+      form.querySelector("fieldset")!.disabled = false;
+      const update = () => {
+        const view = modelView(kind, input.valueAsNumber, lang);
+        this.querySelector("output")!.textContent = `${formatNumber(input.valueAsNumber)} ${definition.input.unit}`;
+        this.querySelector("[data-result]")!.textContent = view.value;
+        this.querySelector("[data-summary]")!.textContent = view.summary;
+        this.querySelector("[data-detail]")!.textContent = view.detail;
+        this.toggleAttribute("data-negative", kind === "delegation" && input.valueAsNumber > 12);
+        svg.setAttribute("aria-label", `${definition.title} ${view.summary} ${view.detail}`);
+        view.lines.forEach((line) => this.querySelector(`[data-line="${line.tone}"]`)!.setAttribute("points", linePoints(line, view)));
+        const [x, y] = plotPoint(...view.marker, view);
+        const marker = this.querySelector("[data-marker]")!;
+        marker.setAttribute("cx", String(x));
+        marker.setAttribute("cy", String(y));
+        const guideX = this.querySelector("[data-guide-x]")!;
+        guideX.setAttribute("x1", String(x));
+        guideX.setAttribute("x2", String(x));
+        guideX.setAttribute("y1", String(y));
+        const guideY = this.querySelector("[data-guide-y]")!;
+        guideY.setAttribute("x2", String(x));
+        guideY.setAttribute("y1", String(y));
+        guideY.setAttribute("y2", String(y));
+        const gap = this.querySelector("[data-gap]");
+        if (gap) {
+          gap.setAttribute("x1", String(x));
+          gap.setAttribute("x2", String(x));
+          gap.setAttribute("y2", String(y));
+        }
+      };
+      form.addEventListener("submit", (event) => event.preventDefault());
+      form.addEventListener("input", update);
+      form.addEventListener("reset", () => {
+        input.value = input.defaultValue;
+        update();
+      });
+    }
+  }
+  if (!customElements.get("article-model")) customElements.define("article-model", ArticleModel);
+</script>
+
+<style>
+  article-model { display: block; margin: 3rem 0; padding: 1.7rem; border: 1px solid var(--line); border-top: 3px solid var(--blue); background: rgba(255,255,255,.23); font-size: .88rem; line-height: 1.65; }
+  .experiment-header { display: flex; align-items: center; justify-content: space-between; gap: .6rem; flex-wrap: wrap; }
+  .experiment-kicker { font: .7rem var(--mono); color: var(--blue); letter-spacing: .07em; }
+  .assumption-tag { font-size: .68rem; color: var(--muted); }
+  h3 { margin: 1rem 0 .6rem; font: 500 clamp(1.2rem, 3vw, 1.5rem)/1.45 var(--body); text-wrap: balance; }
+  .experiment-intro { margin: 0 0 1rem; color: var(--muted); }
+  .model-context { margin: 0 0 1.4rem; padding: .7rem 0; border-block: 1px solid var(--line); color: var(--muted); font-size: .75rem; }
+  .experiment-workbench { display: grid; grid-template-columns: 1.15fr 1fr; gap: 1.8rem; align-items: start; }
+  fieldset { margin: 0; border: 0; padding: 0; min-width: 0; }
+  .model-control { margin-bottom: 1rem; }
+  .control-caption { display: flex; align-items: baseline; justify-content: space-between; gap: .5rem; }
+  label { font-size: .76rem; }
+  output { flex-shrink: 0; font: .85rem var(--mono); color: var(--blue); }
+  output small { font: .66rem var(--body); }
+  input[type="range"] { display: block; width: 100%; margin: .15rem 0 0; height: 30px; cursor: pointer; accent-color: var(--blue); }
+  .control-ends { display: flex; justify-content: space-between; color: var(--muted); font: .63rem var(--mono); }
+  .model-actions { display: flex; gap: .7rem; align-items: center; margin-top: 1.5rem; }
+  button { padding: .5rem .7rem; border: 1px solid var(--line); background: transparent; color: var(--ink); font: .73rem var(--body); cursor: pointer; }
+  button:hover { border-color: var(--blue); color: var(--blue); }
+  button:focus-visible, input:focus-visible, summary:focus-visible { outline: 2px solid var(--blue); outline-offset: 4px; }
+  .model-actions > span { font-size: .65rem; color: var(--muted); }
+  .model-result { padding: 1rem 0 1rem 1.5rem; border-left: 1px solid var(--line); }
+  .result-label { display: block; color: var(--muted); font-size: .73rem; }
+  .model-result strong { display: block; margin: .3rem 0; color: var(--blue); font: 500 clamp(2.8rem, 6vw, 3.8rem)/1.1 var(--body); font-variant-numeric: lining-nums tabular-nums; }
+  .result-unit { display: block; font-size: .7rem; color: var(--muted); }
+  .model-result p { margin: 1rem 0 0; font-size: .82rem; }
+  figure { margin: 1.8rem 0 1.2rem; }
+  .chart-scroll { overflow-x: auto; }
+  .chart-scroll:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+  .mobile-chart-hint { display: none; color: var(--muted); font-size: .67rem; }
+  svg { display: block; min-width: 480px; width: 100%; overflow: visible; font-family: var(--body); }
+  .axis-tick { font: 12px var(--mono); fill: var(--muted); }
+  .axis-label { font-size: 12px; fill: var(--muted); }
+  .grid-line { stroke: var(--line); stroke-width: .7; }
+  .axis-line { stroke: var(--muted); stroke-width: 1; }
+  .chart-line { fill: none; stroke-width: 2; stroke-linejoin: round; }
+  .chart-line.potential { stroke: var(--muted); stroke-dasharray: 7 5; }
+  .chart-line.human { stroke: #94603b; stroke-dasharray: 5 4; }
+  .chart-line.primary { stroke: var(--blue); stroke-width: 3; }
+  .marker-guide { stroke: var(--blue); stroke-width: 1; stroke-opacity: .45; stroke-dasharray: 3 4; }
+  .current-point { fill: var(--blue); stroke: var(--paper); stroke-width: 2.5; }
+  .savings-gap { stroke: var(--blue); stroke-width: 4; opacity: .5; }
+  [data-negative] .model-result strong { color: #a63e29; }
+  [data-negative] .savings-gap { stroke: #a63e29; }
+  .model-legend { display: flex; flex-wrap: wrap; gap: .4rem 1rem; margin-top: .4rem; font-size: .67rem; color: var(--muted); }
+  .model-legend span { display: inline-flex; align-items: center; gap: .4rem; }
+  .model-legend i { width: 18px; border-top: 2px solid var(--blue); }
+  .model-legend .potential { border-color: var(--muted); border-top-style: dashed; }
+  .model-legend .human { border-color: #94603b; border-top-style: dashed; }
+  .model-legend .point { border: 0; width: 6px; height: 6px; border-radius: 50%; background: var(--blue); }
+  .chart-caption { display: block; margin-top: .6rem; font-size: .68rem; color: var(--muted); }
+  .model-formula { margin-top: .8rem; font-size: .76rem; }
+  details { padding-top: .8rem; border-top: 1px solid var(--line); color: var(--muted); font-size: .73rem; }
+  summary { cursor: pointer; color: var(--ink); }
+  details p { margin: .8rem 0 0; }
+  .no-script { color: var(--muted); font-size: .75rem; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+  @media (max-width: 600px) {
+    article-model { padding: 1rem; margin: 2rem 0; }
+    .experiment-workbench { grid-template-columns: 1fr; gap: 1.4rem; }
+    .model-result { padding: 1rem 0 0; border-left: 0; border-top: 1px solid var(--line); }
+    .model-result strong { font-size: 3.3rem; }
+    label { font-size: .73rem; }
+    output { font-size: .78rem; }
+    .control-caption { flex-wrap: wrap; }
+    figure { margin-top: 1.5rem; }
+    .mobile-chart-hint { display: block; margin-bottom: .5rem; }
+  }
+</style>
